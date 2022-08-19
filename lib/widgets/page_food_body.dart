@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:food_delivery/utils/colors.dart';
 import 'package:food_delivery/widgets/big_text.dart';
+import 'package:food_delivery/widgets/icons_and_text.dart';
 import 'package:food_delivery/widgets/small_text.dart';
 
 class PageFoodBody extends StatefulWidget {
@@ -10,12 +12,38 @@ class PageFoodBody extends StatefulWidget {
 }
 
 class _PageFoodBodyState extends State<PageFoodBody> {
+  double scaleFactor = 0.8;
+
   //viewportfraction shows side items in page view
   PageController pageCon = PageController(viewportFraction: 0.87);
+
+  // pagevalue is not the same as pageindex
+  // pagevalue counts by decimal numbers
+  double _currPageVal = 0.0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    pageCon.addListener(() {
+      setState(() {
+        _currPageVal = pageCon.page!;
+      });
+      print("Current Page value is ${_currPageVal.toString()} ");
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    pageCon.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      // color: Colors.red,
+      color: Colors.red,
       margin: EdgeInsets.only(left: 5, right: 5),
       height: 320,
       child: PageView.builder(
@@ -28,8 +56,27 @@ class _PageFoodBodyState extends State<PageFoodBody> {
   }
 
   Widget PageFoodItem(int index) {
-    return Padding(
-        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+    Matrix4 matrix = Matrix4.identity();
+    if (index == _currPageVal.floor()) {
+      // var currscale = 1 - (_currPageVal - index) * (1 - scaleFactor);
+      var currscale = 1.0;
+      matrix = Matrix4.diagonal3Values(1, currscale, 1);
+    } else if (index == _currPageVal.floor() - 1) {
+      // var currscale = scaleFactor + (1 - _currPageVal )
+      var currscale = scaleFactor;
+      matrix = Matrix4.diagonal3Values(1, currscale, 1);
+    }
+    //for next page
+    else if (index == _currPageVal.floor() + 1) {
+      var currscale =
+          scaleFactor + (_currPageVal - index + 1) * (1 - scaleFactor);
+      matrix = Matrix4.diagonal3Values(1, currscale, 1);
+    }
+
+    return Transform(
+      transform: matrix,
+      child: Padding(
+        padding: EdgeInsets.only(left: 5, right: 5, bottom: 30),
         child: Stack(
           children: [
             Container(
@@ -45,81 +92,106 @@ class _PageFoodBodyState extends State<PageFoodBody> {
               alignment: Alignment.bottomCenter,
               child: Padding(
                 padding: const EdgeInsets.only(
-                  left: 30,
-                  right: 30,
+                  left: 15,
+                  right: 15,
+                  bottom: 10,
                 ),
                 child: Container(
-                  height: 140,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25),
-                    color: Colors.white,
-                  ),
+                    height: 110,
+                    width: 470,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      color: Colors.white,
+                    ),
 
-                  //page view small item
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        top: 16, left: 16, right: 16, bottom: 15),
-                    child: Container(
-                      width: 230,
+                    //page view small item
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(top: 13, left: 15, right: 15),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            children: [
-                              BigText(
-                                text: "Bitter Orange Marinade",
-                                color: Colors.black,
-                                size: 20,
-                              ),
-                            ],
+                          BigText(
+                            text: "Chinese Side",
+                            size: 20,
+                            color: AppColors.titleColor,
                           ),
                           SizedBox(
-                            height: 5,
+                            height: 7,
                           ),
                           Row(
                             children: [
-                              Row(
+                              Wrap(
                                 children: List.generate(
                                     5,
                                     (index) => Icon(
                                           Icons.star,
-                                          size: 15,
+                                          color: AppColors.mainColor,
+                                          size: 16,
                                         )),
+                              ),
+                              SizedBox(
+                                width: 7,
                               ),
                               SmallText(
                                 text: "4.5",
-                                color: Colors.grey,
+                                size: 14,
+                                color: AppColors.signColor,
+                              ),
+                              SizedBox(
+                                width: 7,
                               ),
                               SmallText(
-                                text: "12887 comments",
-                                color: Colors.grey,
-                              )
+                                text: "2335",
+                                size: 14,
+                                color: AppColors.signColor,
+                              ),
+                              SizedBox(
+                                width: 7,
+                              ),
+                              SmallText(
+                                text: "comments",
+                                size: 14,
+                                color: AppColors.signColor,
+                              ),
                             ],
                           ),
                           SizedBox(
-                            height: 15,
+                            height: 10,
                           ),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                children: [Icon(Icons.star), Text("Normal")],
+                              Icon_and_Text_Widget(
+                                  icon: Icons.circle_sharp,
+                                  color: AppColors.signColor,
+                                  iconColor: AppColors.yellowColor,
+                                  text: "Normal"),
+                              SizedBox(
+                                width: 5,
                               ),
-                              Row(
-                                children: [Icon(Icons.star), Text("Normal")],
+                              Icon_and_Text_Widget(
+                                  icon: Icons.location_on,
+                                  color: AppColors.signColor,
+                                  iconColor: AppColors.mainColor,
+                                  text: "1.7km"),
+                              SizedBox(
+                                width: 5,
                               ),
-                              Row(
-                                children: [Icon(Icons.star), Text("Normal")],
-                              ),
+                              Icon_and_Text_Widget(
+                                  icon: Icons.access_time_rounded,
+                                  color: AppColors.signColor,
+                                  iconColor: AppColors.iconColor2,
+                                  text: "32mins"),
                             ],
                           )
                         ],
                       ),
-                    ),
-                  ),
-                ),
+                    )),
               ),
             )
           ],
-        ));
+        ),
+      ),
+    );
   }
 }

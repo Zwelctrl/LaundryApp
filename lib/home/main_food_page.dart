@@ -27,7 +27,7 @@ class _MainPageState extends State<MainPage> {
                   children: [
                     BigText(
                       text: 'Myanmar',
-                      color: AppColors.mainColor,
+                      color: AppColors.mainColor, 
                       size: 20,
                     ),
                     Row(
